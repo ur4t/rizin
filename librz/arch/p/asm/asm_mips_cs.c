@@ -93,6 +93,45 @@ static int mips_assemble(RzAsm *a, RzAsmOp *op, const char *str) {
 	return ret;
 }
 
+char **mips_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"mips3", "MIPS III architecture.",
+		"mips1", "MIPS I architecture",
+		"mips2", "MIPS II architecture",
+		"mips32r2", "MIPS32 Release 2 architecture",
+		"mips32r3", "MIPS32 Release 3 architecture",
+		"mips32r5", "MIPS32 Release 5 architecture",
+		"mips32r6", "MIPS32 Release 6 architecture",
+		"mips4", "MIPS IV architecture",
+		"mips5", "MIPS V architecture",
+		"mips64r2", "MIPS64 Release 2 architecture",
+		"mips64r3", "MIPS64 Release 3 architecture",
+		"mips64r5", "MIPS64 Release 5 architecture",
+		"mips64r6", "MIPS64 Release 6 architecture",
+		"octeon", "OCTEON architecture (also known as cnMIPS)",
+		"octeonp", "OCTEON+ architecture (also known as cnMIPS+)",
+		"nanomips", "nanoMIPS architecture",
+		"nms1", "nanoMIPS Release 1 architecture",
+		"i7200", "nanoMIPS i7200 architecture",
+		"micromips", "microMIPS architecture",
+		"micro32r3", "microMIPS32 Release 3 architecture",
+		"micro32r6", "microMIPS32 Release 6 architecture",
+		"r2300", "R2300 MIPS cpu",
+		"r2600", "R2600 MIPS cpu",
+		"r2800", "R2800 MIPS cpu",
+		"r2000a", "R2000A MIPS cpu",
+		"r2000", "R2000 MIPS cpu",
+		"r3000a", "R3000A MIPS cpu",
+		"r3000", "R3000 MIPS cpu",
+		"r10000", "R10000 MIPS cpu",
+		"noptr64", "Special MIPS configuration to disable support for 64-bit pointers",
+		"nofloat", "Special MIPS configuration to disable support for floating-points",
+		NULL
+	};
+
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_mips_cs = {
 	.name = "mips",
 	.desc = "Capstone MIPS disassembler",
@@ -105,7 +144,8 @@ RzAsmPlugin rz_asm_plugin_mips_cs = {
 	.fini = mips_asm_fini,
 	.disassemble = &mips_disassemble,
 	.mnemonics = mips_asm_mnemonics,
-	.assemble = &mips_assemble
+	.assemble = &mips_assemble,
+	.get_cpu_desc = mips_cpu_descriptions,
 };
 
 #ifndef RZ_PLUGIN_INCORE

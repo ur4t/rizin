@@ -37,6 +37,28 @@ static int assemble(RzAsm *a, RzAsmOp *ao, const char *str) {
 	return (int)written;
 }
 
+char **avr_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"ATmega8", "8-bit AVR microcontroller with 8KB Flash, 1KB SRAM",
+		"ATmega1280", "8-bit AVR microcontroller with 128KB Flash, 8KB SRAM",
+		"ATmega1281", "8-bit AVR microcontroller with 128KB Flash, 8KB SRAM",
+		"ATmega16", "8-bit AVR microcontroller with 16KB Flash, 1KB SRAM",
+		"ATmega168", "8-bit AVR microcontroller with 16KB Flash, 1KB SRAMs",
+		"ATmega2560", "8-bit AVR microcontroller with 256KB Flash, 8KB SRAM",
+		"ATmega2561", "8-bit AVR microcontroller with 256KB Flash, 8KB SRAM",
+		"ATmega328p", "8-bit AVR microcontroller with 32KB Flash, 2KB SRAM",
+		"ATmega32u4", "8-bit AVR microcontroller with 32KB Flash, 2.5KB SRAM",
+		"ATmega48", "8-bit AVR microcontroller with 4KB Flash, 512B SRAM",
+		"ATmega640", "8-bit AVR microcontroller with 64KB Flash, 8KB SRAM",
+		"ATmega88", "8-bit AVR microcontroller with 8KB Flash, 1KB SRAM",
+		"ATxmega128a4u", "8-bit AVR microcontroller with 128KB Flash, 8KB SRAM",
+		"ATTiny48", "8-bit AVR microcontroller with 4KB Flash, 256B SRAM",
+		"ATTiny88", "8-bit AVR microcontroller with 8KB Flash, 512B SRAM",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_avr = {
 	.name = "avr",
 	.arch = "avr",
@@ -61,5 +83,6 @@ RzAsmPlugin rz_asm_plugin_avr = {
 		"ATmega88,"
 		"ATxmega128a4u,"
 		"ATTiny48,"
-		"ATTiny88,"
+		"ATTiny88,",
+	.get_cpu_desc = avr_cpu_descriptions,
 };

@@ -285,6 +285,18 @@ static char *mnemonics(RzAsm *a, int id, bool json) {
 	return rz_strbuf_drain(buf);
 }
 
+char **arm_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"v8", "ARMv8 version",
+		"cortexm", "ARM Cortex-M family",
+		"arm1176", "ARM1176JZ(F)-S processor, ARMv6 version",
+		"cortexA72", "ARM Cortex-A72 processor, ARMv8-A version",
+		"cortexA8", "ARM Cortex-A8, ARMv7-A version",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_arm_cs = {
 	.name = "arm",
 	.desc = "Capstone ARM disassembler",
@@ -300,6 +312,7 @@ RzAsmPlugin rz_asm_plugin_arm_cs = {
 	.assemble = &assemble,
 	.init = &arm_init,
 	.fini = &arm_fini,
+	.get_cpu_desc = arm_cpu_descriptions,
 #if 0
 	// arm32 and arm64
 	"crypto,databarrier,divide,fparmv8,multpro,neon,t2extractpack,"

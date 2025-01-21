@@ -29,6 +29,16 @@ beach:
 	return -1;
 }
 
+char **xtensa_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"esp32", "Xtensa microcontroller with Wi-Fi and Bluetooth capabilities",
+		"esp32s2", "Xtensa microcontroller with Wi-Fi and USB OTG support",
+		"esp8266", "Xtensa microcontroller with Wi-Fi support",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_xtensa_cs = {
 	.name = "xtensa",
 	.license = "LGPL3",
@@ -41,4 +51,5 @@ RzAsmPlugin rz_asm_plugin_xtensa_cs = {
 	.disassemble = asm_xtensa_disassemble,
 	.init = &xtensa_init,
 	.fini = &xtensa_fini,
+	.get_cpu_desc = xtensa_cpu_descriptions,
 };

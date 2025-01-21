@@ -147,6 +147,7 @@ typedef struct rz_asm_plugin_t {
 	RZ_OWN RzConfig *(*get_config)(void *plugin_data);
 	const char *features;
 	const char *platforms;
+	char **(*get_cpu_desc)();
 } RzAsmPlugin;
 
 /**

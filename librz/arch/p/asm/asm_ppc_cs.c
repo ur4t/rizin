@@ -116,6 +116,17 @@ static int ppc_disassemble(RzAsm *a, RzAsmOp *op, const ut8 *buf, int len) {
 	return op->size;
 }
 
+char **ppc_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"ppc", "Generic PowerPC CPU",
+		"vle", "PowerPC with Variable Length Encoding extension",
+		"ps", "PowerPC with Paired Single SIMD extension",
+		"qpx", "PowerPC with Quad Processing eXtensions",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_ppc_cs = {
 	.name = "ppc",
 	.desc = "Capstone PowerPC disassembler",
@@ -129,6 +140,7 @@ RzAsmPlugin rz_asm_plugin_ppc_cs = {
 	.fini = ppc_asm_fini,
 	.disassemble = &ppc_disassemble,
 	.mnemonics = ppc_asm_mnemonics,
+	.get_cpu_desc = ppc_cpu_descriptions,
 };
 
 #ifndef RZ_PLUGIN_INCORE

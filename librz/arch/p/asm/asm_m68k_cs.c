@@ -115,6 +115,19 @@ beach:
 	return ret;
 }
 
+char **m68k_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"68000", "Motorola 68000: 16/32-bit CISC microprocessor",
+		"68010", "Motorola 68010: 16/32-bit microprocessors. Successor to Motoroloa 68000",
+		"68020", "Motorola 68020: 32-bit microprocessor with added instructions and additional addressing modes",
+		"68030", "Motorola 68030: Enhanced 32-bit microprocessor with integrated MMU",
+		"68040", "Motorola 68040: High-performance 32-bit microprocessor with integrated FPU",
+		"68060", "Motorola 68060: 32-bit microprocessor, highest performer in m68k series",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_m68k_cs = {
 	.name = "m68k",
 	.desc = "Capstone M68K disassembler",
@@ -127,6 +140,7 @@ RzAsmPlugin rz_asm_plugin_m68k_cs = {
 	.fini = m68k_asm_fini,
 	.disassemble = &m68k_disassemble,
 	.mnemonics = &m68k_asm_mnemonics,
+	.get_cpu_desc = m68k_cpu_descriptions,
 };
 
 #ifndef RZ_PLUGIN_INCORE

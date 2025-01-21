@@ -21,6 +21,19 @@ static int asm_pic_disassemble(RzAsm *a, RzAsmOp *op, const ut8 *b, int l) {
 	return op->size = res;
 }
 
+char **pic_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"pic18", "PIC18: High-performance 8-bit microcontroller family",
+		"pic16", "PIC16: Mid-range 8-bit microcontroller family",
+		"pic14", "PIC14: 14-bit instruction set microcontroller family",
+		"highend", "Alias for PIC18",
+		"midrange", "Alias for PIC16",
+		"baseline", "Alias for PIC14",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_pic = {
 	.name = "pic",
 	.arch = "pic",
@@ -28,7 +41,8 @@ RzAsmPlugin rz_asm_plugin_pic = {
 	.bits = 16 | 32,
 	.license = "LGPL3",
 	.desc = "PIC disassembler",
-	.disassemble = &asm_pic_disassemble
+	.disassemble = &asm_pic_disassemble,
+	.get_cpu_desc = pic_cpu_descriptions,
 };
 
 #ifndef RZ_PLUGIN_INCORE

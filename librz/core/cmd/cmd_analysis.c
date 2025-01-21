@@ -5500,6 +5500,10 @@ RZ_IPI RzCmdStatus rz_list_plugins_handler(RzCore *core, int argc, const char **
 	return rz_core_asm_plugins_print(core, NULL, state, NULL);
 }
 
+RZ_IPI RzCmdStatus rz_list_cpu_details_handler(RzCore *core, int argc, const char **argv) {
+	return rz_core_cpu_descs_print(core, argv[1]);
+}
+
 RZ_IPI RzCmdStatus rz_analyse_name_handler(RzCore *core, int argc, const char **argv, RzCmdStateOutput *state) {
 	if (argc > 1) {
 		bool ret = rz_core_analysis_rename(core, argv[1], core->offset);

@@ -103,6 +103,14 @@ static bool fini(void *u) {
 	return true;
 }
 
+char **tricore_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"tricore", "Generic TriCore CPU family by Infineon",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_tricore_cs = {
 	.name = "tricore",
 	.arch = "tricore",
@@ -115,6 +123,7 @@ RzAsmPlugin rz_asm_plugin_tricore_cs = {
 	.disassemble = &disassemble,
 	.init = &init,
 	.fini = &fini,
+	.get_cpu_desc = tricore_cpu_descriptions,
 };
 
 #ifndef RZ_PLUGIN_INCORE

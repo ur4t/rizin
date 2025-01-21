@@ -2396,12 +2396,22 @@ commands:
             type: RZ_CMD_ARG_TYPE_NUM
   - name: aL
     summary: List all asm/analysis plugins (e asm.arch=?)
-    cname: list_plugins
-    args: []
-    type: RZ_CMD_DESC_TYPE_ARGV_STATE
-    modes:
-      - RZ_OUTPUT_MODE_STANDARD
-      - RZ_OUTPUT_MODE_JSON
+    subcommands: 
+      - name: aL
+        summary: List all asm/analysis plugins (e asm.arch=?) or CPU details for a plugin.
+        cname: list_plugins
+        args: []
+        type: RZ_CMD_DESC_TYPE_ARGV_STATE
+        modes:
+          - RZ_OUTPUT_MODE_STANDARD
+          - RZ_OUTPUT_MODE_JSON
+      - name: aLc
+        summary: Shows the CPU details for a specific plugin.
+        cname: list_cpu_details
+        args: 
+          - name: plugin_name
+            type: RZ_CMD_ARG_TYPE_STRING
+            optional: false
   - name: ae
     summary: ESIL analysis commands
     subcommands:

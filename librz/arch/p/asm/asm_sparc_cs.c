@@ -65,6 +65,14 @@ fin:
 	return ret;
 }
 
+char **sparc_cpu_descriptions() {
+	static char *cpu_desc[] = {
+		"v9", "SPARC V9: 64-bit RISC architecture specification",
+		NULL
+	};
+	return cpu_desc;
+}
+
 RzAsmPlugin rz_asm_plugin_sparc_cs = {
 	.name = "sparc",
 	.desc = "Capstone SPARC disassembler",
@@ -76,7 +84,8 @@ RzAsmPlugin rz_asm_plugin_sparc_cs = {
 	.init = sparc_asm_init,
 	.fini = sparc_asm_fini,
 	.disassemble = &sparc_disassemble,
-	.mnemonics = sparc_asm_mnemonics
+	.mnemonics = sparc_asm_mnemonics,
+	.get_cpu_desc = sparc_cpu_descriptions,
 };
 
 #ifndef RZ_PLUGIN_INCORE

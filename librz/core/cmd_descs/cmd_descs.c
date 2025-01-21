@@ -320,6 +320,7 @@ static const RzCmdDescArg analysis_syscall_dump_assembly_args[2];
 static const RzCmdDescArg analysis_syscall_dump_c_args[2];
 static const RzCmdDescArg analysis_syscall_name_args[2];
 static const RzCmdDescArg analysis_syscall_number_args[2];
+static const RzCmdDescArg list_cpu_details_args[2];
 static const RzCmdDescArg analyze_esil_eval_expr_args[2];
 static const RzCmdDescArg analyze_esil_set_pc_args[2];
 static const RzCmdDescArg analyze_esil_sdb_query_args[2];
@@ -6459,12 +6460,30 @@ static const RzCmdDescHelp analysis_syscall_number_help = {
 	.args = analysis_syscall_number_args,
 };
 
+static const RzCmdDescHelp aL_help = {
+	.summary = "List all asm/analysis plugins (e asm.arch=?)",
+};
 static const RzCmdDescArg list_plugins_args[] = {
 	{ 0 },
 };
 static const RzCmdDescHelp list_plugins_help = {
-	.summary = "List all asm/analysis plugins (e asm.arch=?)",
+	.summary = "List all asm/analysis plugins (e asm.arch=?) or CPU details for a plugin.",
 	.args = list_plugins_args,
+};
+
+static const RzCmdDescArg list_cpu_details_args[] = {
+	{
+		.name = "plugin_name",
+		.type = RZ_CMD_ARG_TYPE_STRING,
+		.flags = RZ_CMD_ARG_FLAG_LAST,
+		.optional = false,
+
+	},
+	{ 0 },
+};
+static const RzCmdDescHelp list_cpu_details_help = {
+	.summary = "Shows the CPU details for a specific plugin.",
+	.args = list_cpu_details_args,
 };
 
 static const RzCmdDescHelp ae_help = {
@@ -20847,8 +20866,10 @@ RZ_IPI void rzshell_cmddescs_init(RzCore *core) {
 	RzCmdDesc *analysis_syscall_number_cd = rz_cmd_desc_argv_new(core->rcmd, as_cd, "asr", rz_analysis_syscall_number_handler, &analysis_syscall_number_help);
 	rz_warn_if_fail(analysis_syscall_number_cd);
 
-	RzCmdDesc *list_plugins_cd = rz_cmd_desc_argv_state_new(core->rcmd, cmd_analysis_cd, "aL", RZ_OUTPUT_MODE_STANDARD | RZ_OUTPUT_MODE_JSON, rz_list_plugins_handler, &list_plugins_help);
-	rz_warn_if_fail(list_plugins_cd);
+	RzCmdDesc *aL_cd = rz_cmd_desc_group_state_new(core->rcmd, cmd_analysis_cd, "aL", RZ_OUTPUT_MODE_STANDARD | RZ_OUTPUT_MODE_JSON, rz_list_plugins_handler, &list_plugins_help, &aL_help);
+	rz_warn_if_fail(aL_cd);
+	RzCmdDesc *list_cpu_details_cd = rz_cmd_desc_argv_new(core->rcmd, aL_cd, "aLc", rz_list_cpu_details_handler, &list_cpu_details_help);
+	rz_warn_if_fail(list_cpu_details_cd);
 
 	RzCmdDesc *ae_cd = rz_cmd_desc_group_new(core->rcmd, cmd_analysis_cd, "ae", rz_analyze_esil_eval_expr_handler, &analyze_esil_eval_expr_help, &ae_help);
 	rz_warn_if_fail(ae_cd);
