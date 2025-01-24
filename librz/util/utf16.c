@@ -4,60 +4,103 @@
 #include <rz_types.h>
 #include <rz_util.h>
 
-/* Convert an UTF-16 buf into a unicode RzRune */
-RZ_API int rz_utf16_decode(const ut8 *ptr, int ptrlen, RzRune *ch, bool bigendian) {
-	if (ptrlen < 1) {
+// For high: Only d8-db
+// For low: Only dc-df
+static bool is_valid_surrogate_pair(ut8 high_byte_surrogate, ut8 low_byte_surrogate) {
+	bool high_ok = high_byte_surrogate >= 0xd8 && high_byte_surrogate <= 0xdb;
+	bool low_ok = low_byte_surrogate >= 0xdc && low_byte_surrogate <= 0xdf;
+	return high_ok && low_ok;
+}
+
+static RzRune utf16_surrogate_to_codepoint(ut16 high_surrogate, ut16 low_surrogate) {
+	ut32 high = (high_surrogate - 0xd800) * 0x400;
+	ut32 low = (low_surrogate - 0xdc00);
+	RzRune codepoint = high + low;
+	RzRune codepoint1 = 0x10000 + codepoint;
+	return codepoint1;
+}
+
+/**
+ * \brief Decode UTF-16 bytes to Unicode code point.
+ *
+ * \param buf       The buffer to read the bytes from.
+ * \param buf_len   The buffer length.
+ * \param codepoint The decoded code point.
+ * \param bigendian Flag if the \p buf holds UTF-16 bytes in big endian.
+ *
+ * \return Number of bytes decoded.
+ */
+RZ_API size_t rz_utf16_decode(const ut8 *buf, int buf_len, RZ_NONNULL RZ_OUT RzRune *ch, bool bigendian) {
+	rz_return_val_if_fail(buf && ch, 0);
+	if (buf_len <= 1) {
 		return 0;
 	}
 	int high = bigendian ? 0 : 1;
 	int low = bigendian ? 1 : 0;
-	if (ptrlen > 3 && (ptr[high] & 0xdc) == 0xd8 && (ptr[high + 2] & 0xdc) == 0xdc) {
-		if (ch) {
-			*ch = ((ptr[high] & 3) << 24 | ptr[low] << 16 | (ptr[high + 2] & 3) << 8 | ptr[low + 2]) + 0x10000;
-		}
+	if (buf_len > 3 && is_valid_surrogate_pair(buf[high], buf[high + 2])) {
+		*ch = utf16_surrogate_to_codepoint((buf[high] << 8 | buf[low]), (buf[high + 2] << 8) | buf[low + 2]);
 		return 4;
 	}
-	if (ptrlen > 1 && ptr[high]) {
-		if (ch) {
-			*ch = ptr[high] << 8 | ptr[low];
-		}
+	if (buf[high]) {
+		*ch = buf[high] << 8 | buf[low];
 		return 2;
 	}
-	if (ptrlen > 1) {
-		if (ch) {
-			*ch = (ut32)ptr[low];
-		}
-		return 1;
-	}
-	return 0;
+	*ch = (ut32)buf[low];
+	return 1;
 }
 
-/* Convert an UTF-16LE buf into a unicode RzRune */
-RZ_API int rz_utf16le_decode(const ut8 *ptr, int ptrlen, RzRune *ch) {
-	return rz_utf16_decode(ptr, ptrlen, ch, false);
+/**
+ * \brief Decode UTF-16 bytes in little endian to the Unicode code point.
+ *
+ * \param buf       The buffer to read the bytes from.
+ * \param buf_len   The buffer length.
+ * \param codepoint The decoded code point.
+ *
+ * \return Number of bytes decoded.
+ */
+RZ_API size_t rz_utf16le_decode(const ut8 *buf, int buf_len, RZ_NONNULL RZ_OUT RzRune *codepoint) {
+	rz_return_val_if_fail(buf && codepoint, 0);
+	return rz_utf16_decode(buf, buf_len, codepoint, false);
 }
 
-/* Convert an UTF-16BE buf into a unicode RzRune */
-RZ_API int rz_utf16be_decode(const ut8 *ptr, int ptrlen, RzRune *ch) {
-	return rz_utf16_decode(ptr, ptrlen, ch, true);
+/**
+ * \brief Decode UTF-16 bytes in big endian to the Unicode code point.
+ *
+ * \param buf       The buffer to read the bytes from.
+ * \param buf_len   The buffer length.
+ * \param codepoint The decoded code point.
+ *
+ * \return Number of bytes decoded.
+ */
+RZ_API size_t rz_utf16be_decode(const ut8 *buf, int buf_len, RZ_NONNULL RZ_OUT RzRune *codepoint) {
+	rz_return_val_if_fail(buf && codepoint, 0);
+	return rz_utf16_decode(buf, buf_len, codepoint, true);
 }
 
-/* Convert a unicode RzRune into a UTF-16LE buf */
-RZ_API int rz_utf16le_encode(ut8 *ptr, RzRune ch) {
-	if (ch < 0x10000) {
-		ptr[0] = ch & 0xff;
-		ptr[1] = ch >> 8 & 0xff;
+/**
+ * \brief Encodes a Unicode code point to little endian UTF16 bytes.
+ *
+ * \param buf       The buffer to write the bytes to. Must be at least 4 bytes.
+ * \param codepoint The code point to encode.
+ *
+ * \return Number of bytes encoded.
+ */
+RZ_API size_t rz_utf16le_encode(RZ_NONNULL RZ_OUT ut8 *buf, RzRune codepoint) {
+	rz_return_val_if_fail(buf, 0);
+	if (codepoint < 0x10000) {
+		buf[0] = codepoint & 0xff;
+		buf[1] = codepoint >> 8 & 0xff;
 		return 2;
 	}
-	if (ch < 0x110000) {
-		ch -= 0x10000;
-		RzRune high = 0xd800 + (ch >> 10 & 0x3ff);
-		RzRune low = 0xdc00 + (ch & 0x3ff);
-		ptr[0] = high & 0xff;
-		ptr[1] = high >> 8 & 0xff;
-		ptr[2] = low & 0xff;
-		ptr[3] = low >> 8 & 0xff;
-		return 4;
+	if (codepoint > 0x10FFFF) {
+		return 0;
 	}
-	return 0;
+	codepoint -= 0x10000;
+	RzRune high = 0xd800 + ((codepoint >> 10) & 0x3ff);
+	RzRune low = 0xdc00 + (codepoint & 0x3ff);
+	buf[0] = high & 0xff;
+	buf[1] = high >> 8 & 0xff;
+	buf[2] = low & 0xff;
+	buf[3] = low >> 8 & 0xff;
+	return 4;
 }
